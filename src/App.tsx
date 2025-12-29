@@ -102,6 +102,8 @@ const App = () => {
     return groups;
   })();
 
+  const waitingCount = queue.filter(p => p.status === 'waiting').length;
+
   // --- Actions ---
   const addToQueue = (e: React.FormEvent) => {
     e.preventDefault();
@@ -244,17 +246,17 @@ const App = () => {
             <h1 className="text-2xl font-black italic tracking-wider flex items-center gap-2">
               PRO<span className="text-blue-200">QUEUE</span>
             </h1>
-            <div className="flex items-center gap-2 mt-1">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-blue-100 flex items-center gap-1">
+            <div className="flex items-center gap-2 mt-1 opacity-90">
+              <label className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
                 <Settings size={10} /> {courtCount} Courts Configured
               </label>
               <select
                 value={courtCount}
                 onChange={(e) => setCourtCount(Number(e.target.value))}
-                className="bg-black/20 hover:bg-black/30 text-[10px] border-none rounded px-1 py-0.5 outline-none font-bold cursor-pointer appearance-none transition-colors"
+                className="bg-sky-800 text-[10px] border-none rounded px-1 py-0.5 outline-none font-bold cursor-pointer appearance-none text-sky-100"
               >
                 {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
-                  <option key={n} value={n} className="bg-slate-900 text-white">
+                  <option key={n} value={n}>
                     {n} Courts
                   </option>
                 ))}
@@ -300,6 +302,7 @@ const App = () => {
           onStartGroup={startGroup}
           onRemoveItem={removeItem}
           playersPerGame={PLAYERS_PER_GAME}
+          waitingCount={waitingCount}
         />
 
         <GameHistory
@@ -313,31 +316,31 @@ const App = () => {
           <div className="flex gap-6">
             <div className="text-left">
               <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
-                Avg Wait
+                Est. Wait
               </p>
-              <p className="text-sm font-black text-primary italic">
+              <p className="text-sm font-black italic text-accent">
                 {groupedWaitlist.length > 0
                   ? getWaitTimeForGroup(groupedWaitlist.length - 1)
                   : 0}{" "}
-                MIN
+                MINS
               </p>
             </div>
-            <div className="w-[1px] h-8 bg-slate-800 self-center"></div>
+            <div className="w-px h-8 bg-slate-800 self-center"></div>
             <div className="text-left">
               <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
-                Played Today
+                Games Completed
               </p>
-              <p className="text-sm font-black text-blue-400">
-                {history.length} GAMES
+              <p className="text-sm font-black text-sky-400">
+                {history.length} SESSIONS
               </p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
-              Courts
+              Court Load
             </p>
             <p className="text-sm font-black">
-              <span className="text-primary">{occupiedCount}</span>
+              <span className="text-accent">{occupiedCount}</span>
               <span className="text-slate-600 mx-1">/</span>
               {courtCount}
             </p>

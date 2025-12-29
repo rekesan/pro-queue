@@ -19,16 +19,16 @@ export const AddPlayerForm = ({
   onLoadMock,
 }: AddPlayerFormProps) => {
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-6 border-2 border-primary/50 animate-in fade-in zoom-in duration-200">
+    <div className="bg-white rounded-2xl shadow-xl p-6 border-2 border-primary animate-in fade-in zoom-in duration-200">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold flex items-center gap-2 text-slate-800">
-          <Plus className="text-primary" /> Join Hopper
+          <Plus className="text-primary" /> Register Player
         </h2>
         <button
           onClick={onLoadMock}
           className="text-[10px] font-black text-slate-400 border border-slate-200 px-2 py-1 rounded hover:bg-slate-50 flex items-center gap-1 uppercase"
         >
-          <Database size={10} /> Load 15 Pro Players
+          <Database size={10} /> Demo Mode
         </button>
       </div>
       <form onSubmit={onSubmit} className="space-y-4">
@@ -47,7 +47,7 @@ export const AddPlayerForm = ({
               onClick={() => setLevel(l)}
               className={`py-2 rounded-lg text-sm font-bold border-2 transition-all ${
                 level === l
-                  ? "border-primary bg-primary/10 text-primary"
+                  ? "bg-primary-light border-primary text-primary-dark"
                   : "border-slate-200 text-slate-400"
               }`}
             >
@@ -55,8 +55,8 @@ export const AddPlayerForm = ({
             </button>
           ))}
         </div>
-        <button className="w-full bg-primary text-white py-4 rounded-xl font-black text-lg shadow-lg hover:bg-primary/90 transition-colors">
-          ADD TO HOPPER
+        <button className="w-full bg-primary text-white py-4 rounded-xl font-black text-lg shadow-lg hover:brightness-110 transition-all">
+          JOIN THE HOPPER
         </button>
       </form>
     </div>

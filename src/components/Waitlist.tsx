@@ -1,5 +1,5 @@
 import type { Player } from "../types";
-import { Lock, Shuffle, Trash2 } from "lucide-react";
+import { Lock, Shuffle, Trash2, Users } from "lucide-react";
 
 interface WaitlistProps {
   groupedWaitlist: Player[][];
@@ -8,6 +8,7 @@ interface WaitlistProps {
   onStartGroup: (playerIds: string[]) => void;
   onRemoveItem: (id: string) => void;
   playersPerGame: number;
+  waitingCount: number;
 }
 
 export const Waitlist = ({
@@ -17,41 +18,45 @@ export const Waitlist = ({
   onStartGroup,
   onRemoveItem,
   playersPerGame,
+  waitingCount,
 }: WaitlistProps) => {
   return (
     <section>
-      <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4 px-2">
-        Waitlist
-      </h2>
+      <div className="flex justify-between items-center mb-4 px-2">
+        <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">
+          Waitlist
+        </h2>
+        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400">
+          <Users size={12} /> {waitingCount} Waiting
+        </div>
+      </div>
       <div className="space-y-6">
         {groupedWaitlist.map((group, gIdx) => (
           <div
             key={gIdx}
             className={`relative p-4 rounded-2xl border-2 transition-all ${
               group.length === playersPerGame
-                ? "bg-white border-primary/20 shadow-md"
+                ? "bg-white shadow-md border-primary-light"
                 : "bg-slate-50 border-dashed border-slate-200"
             }`}
           >
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
                 <span
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${
-                    group.length === playersPerGame
-                      ? "bg-primary text-white"
-                      : "bg-slate-300 text-white"
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-white ${
+                    group.length === playersPerGame ? "bg-primary" : "bg-slate-300"
                   }`}
                 >
                   {gIdx + 1}
                 </span>
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-tight flex items-center gap-1">
                   {gIdx === 0 && group.length === playersPerGame ? (
-                    <span className="text-primary flex items-center gap-1">
-                      <Lock size={10} /> Stacked
+                    <span className="text-primary-dark flex items-center gap-1">
+                      <Lock size={10} /> Ready to Play
                     </span>
                   ) : group.length === playersPerGame ? (
-                    <span className="text-primary/70 flex items-center gap-1">
-                      <Shuffle size={10} /> Mixed Pairings
+                    <span className="text-blue-500 flex items-center gap-1">
+                      <Shuffle size={10} /> Next Up
                     </span>
                   ) : (
                     `Waiting (${group.length}/${playersPerGame})`
@@ -62,13 +67,13 @@ export const Waitlist = ({
                 <button
                   onClick={() => onStartGroup(group.map((p) => p.id))}
                   disabled={occupiedCount >= courtCount}
-                  className={`px-4 py-1.5 rounded-lg font-black text-xs transition-all ${
+                  className={`px-4 py-1.5 rounded-lg font-black text-xs transition-all shadow-sm ${
                     occupiedCount >= courtCount
-                      ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                      : "bg-primary text-white hover:bg-primary/90"
+                      ? "bg-slate-100 text-slate-400 cursor-not-allowed border-none"
+                      : "bg-accent text-white hover:brightness-110"
                   }`}
                 >
-                  {occupiedCount >= courtCount ? "FULL" : "START"}
+                  {occupiedCount >= courtCount ? "FULL" : "PLAY"}
                 </button>
               )}
             </div>
@@ -80,7 +85,7 @@ export const Waitlist = ({
                 >
                   <span className="font-bold text-sm text-slate-700">
                     {player.name}{" "}
-                    <span className="text-[10px] text-slate-300 ml-2">
+                    <span className="text-[10px] text-slate-300 ml-2 uppercase tracking-tighter">
                       {player.level}
                     </span>
                   </span>
@@ -95,6 +100,14 @@ export const Waitlist = ({
             </div>
           </div>
         ))}
+        {waitingCount === 0 && (
+          <div className="text-center py-12 bg-slate-100 border-2 border-dashed border-slate-200 rounded-3xl opacity-50">
+            <Users size={32} className="mx-auto mb-2 text-slate-300" />
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+              Waitlist
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );

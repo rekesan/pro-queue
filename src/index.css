@@ -2,6 +2,9 @@
 
 @theme {
   --color-primary: #1077d6;
+  --color-primary-light: #e7f1fb;
+  --color-primary-dark: #0b569c;
+  --color-accent: #f59e0b;
 }
 
 @layer base {
