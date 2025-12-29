@@ -19,10 +19,10 @@ export const AddPlayerForm = ({
   onLoadMock,
 }: AddPlayerFormProps) => {
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-6 border-2 border-emerald-500 animate-in fade-in zoom-in duration-200">
+    <div className="bg-white rounded-2xl shadow-xl p-6 border-2 border-primary/50 animate-in fade-in zoom-in duration-200">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold flex items-center gap-2 text-slate-800">
-          <Plus className="text-emerald-600" /> Join Hopper
+          <Plus className="text-primary" /> Join Hopper
         </h2>
         <button
           onClick={onLoadMock}
@@ -34,7 +34,7 @@ export const AddPlayerForm = ({
       <form onSubmit={onSubmit} className="space-y-4">
         <input
           autoFocus
-          className="w-full bg-slate-100 border-none rounded-xl p-3 focus:ring-2 focus:ring-emerald-500 outline-none text-lg"
+          className="w-full bg-slate-100 border-none rounded-xl p-3 focus:ring-2 focus:ring-primary outline-none text-lg"
           placeholder="Enter your name"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -47,7 +47,7 @@ export const AddPlayerForm = ({
               onClick={() => setLevel(l)}
               className={`py-2 rounded-lg text-sm font-bold border-2 transition-all ${
                 level === l
-                  ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                  ? "border-primary bg-primary/10 text-primary"
                   : "border-slate-200 text-slate-400"
               }`}
             >
@@ -55,7 +55,7 @@ export const AddPlayerForm = ({
             </button>
           ))}
         </div>
-        <button className="w-full bg-emerald-600 text-white py-4 rounded-xl font-black text-lg shadow-lg">
+        <button className="w-full bg-primary text-white py-4 rounded-xl font-black text-lg shadow-lg hover:bg-primary/90 transition-colors">
           ADD TO HOPPER
         </button>
       </form>

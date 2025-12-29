@@ -238,23 +238,23 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-24 font-sans">
-      <header className="bg-emerald-600 text-white p-6 shadow-lg sticky top-0 z-50">
+      <header className="bg-primary text-white p-6 shadow-lg sticky top-0 z-50">
         <div className="max-w-2xl mx-auto flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-black italic tracking-wider flex items-center gap-2">
-              PRO<span className="text-emerald-200">QUEUE</span>
+              PRO<span className="text-blue-200">QUEUE</span>
             </h1>
             <div className="flex items-center gap-2 mt-1">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-emerald-100 flex items-center gap-1">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-blue-100 flex items-center gap-1">
                 <Settings size={10} /> {courtCount} Courts Configured
               </label>
               <select
                 value={courtCount}
                 onChange={(e) => setCourtCount(Number(e.target.value))}
-                className="bg-emerald-700 text-[10px] border-none rounded px-1 py-0.5 outline-none font-bold cursor-pointer appearance-none"
+                className="bg-black/20 hover:bg-black/30 text-[10px] border-none rounded px-1 py-0.5 outline-none font-bold cursor-pointer appearance-none transition-colors"
               >
                 {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
-                  <option key={n} value={n}>
+                  <option key={n} value={n} className="bg-slate-900 text-white">
                     {n} Courts
                   </option>
                 ))}
@@ -263,7 +263,7 @@ const App = () => {
           </div>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="bg-white text-emerald-700 p-2 rounded-full shadow-md hover:scale-105 transition-transform"
+            className="bg-white text-primary p-2 rounded-full shadow-md hover:scale-105 transition-transform"
           >
             {showAddForm ? (
               <Trash2 size={24} className="rotate-45" />
@@ -315,7 +315,7 @@ const App = () => {
               <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
                 Avg Wait
               </p>
-              <p className="text-sm font-black text-emerald-400 italic">
+              <p className="text-sm font-black text-primary italic">
                 {groupedWaitlist.length > 0
                   ? getWaitTimeForGroup(groupedWaitlist.length - 1)
                   : 0}{" "}
@@ -337,7 +337,7 @@ const App = () => {
               Courts
             </p>
             <p className="text-sm font-black">
-              <span className="text-emerald-400">{occupiedCount}</span>
+              <span className="text-primary">{occupiedCount}</span>
               <span className="text-slate-600 mx-1">/</span>
               {courtCount}
             </p>

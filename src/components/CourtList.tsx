@@ -30,14 +30,14 @@ export const CourtList = ({
               key={courtNumber}
               className={`p-4 rounded-2xl shadow-sm border transition-all ${
                 isOccupied
-                  ? "bg-white border-emerald-100"
+                  ? "bg-white border-primary/20"
                   : "bg-slate-50 border-dashed border-slate-200 opacity-60"
               } flex flex-col md:flex-row md:items-center gap-4`}
             >
               <div
                 className={`flex-shrink-0 w-full md:w-20 h-12 rounded-xl flex flex-col items-center justify-center shadow-inner ${
                   isOccupied
-                    ? "bg-emerald-600 text-white"
+                    ? "bg-primary text-white"
                     : "bg-slate-300 text-slate-500"
                 }`}
               >
@@ -76,7 +76,7 @@ export const CourtList = ({
                       onClick={() =>
                         onFinishGroup(gamePlayers.map((p) => p.id))
                       }
-                      className="bg-emerald-50 text-emerald-700 px-4 py-2 rounded-xl hover:bg-emerald-100 font-bold text-xs flex items-center gap-2"
+                      className="bg-primary/10 text-primary px-4 py-2 rounded-xl hover:bg-primary/20 font-bold text-xs flex items-center gap-2 transition-colors"
                     >
                       <RotateCcw size={14} /> FINISH
                     </button>

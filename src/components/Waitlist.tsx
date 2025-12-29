@@ -29,7 +29,7 @@ export const Waitlist = ({
             key={gIdx}
             className={`relative p-4 rounded-2xl border-2 transition-all ${
               group.length === playersPerGame
-                ? "bg-white border-blue-100 shadow-md"
+                ? "bg-white border-primary/20 shadow-md"
                 : "bg-slate-50 border-dashed border-slate-200"
             }`}
           >
@@ -38,7 +38,7 @@ export const Waitlist = ({
                 <span
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${
                     group.length === playersPerGame
-                      ? "bg-blue-600 text-white"
+                      ? "bg-primary text-white"
                       : "bg-slate-300 text-white"
                   }`}
                 >
@@ -46,11 +46,11 @@ export const Waitlist = ({
                 </span>
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-tight flex items-center gap-1">
                   {gIdx === 0 && group.length === playersPerGame ? (
-                    <span className="text-emerald-600 flex items-center gap-1">
+                    <span className="text-primary flex items-center gap-1">
                       <Lock size={10} /> Stacked
                     </span>
                   ) : group.length === playersPerGame ? (
-                    <span className="text-blue-500 flex items-center gap-1">
+                    <span className="text-primary/70 flex items-center gap-1">
                       <Shuffle size={10} /> Mixed Pairings
                     </span>
                   ) : (
@@ -65,7 +65,7 @@ export const Waitlist = ({
                   className={`px-4 py-1.5 rounded-lg font-black text-xs transition-all ${
                     occupiedCount >= courtCount
                       ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                      : "bg-blue-600 text-white"
+                      : "bg-primary text-white hover:bg-primary/90"
                   }`}
                 >
                   {occupiedCount >= courtCount ? "FULL" : "START"}
@@ -86,7 +86,7 @@ export const Waitlist = ({
                   </span>
                   <button
                     onClick={() => onRemoveItem(player.id)}
-                    className="text-slate-200 hover:text-red-500"
+                    className="text-slate-200 hover:text-red-500 transition-colors"
                   >
                     <Trash2 size={14} />
                   </button>

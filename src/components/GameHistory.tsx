@@ -16,7 +16,7 @@ export const GameHistory = ({ history, onClearHistory }: GameHistoryProps) => {
         {history.length > 0 && (
           <button
             onClick={onClearHistory}
-            className="text-[10px] font-bold text-slate-400 hover:text-red-500 uppercase"
+            className="text-[10px] font-bold text-slate-400 hover:text-red-500 uppercase transition-colors"
           >
             Clear All
           </button>
@@ -40,7 +40,7 @@ export const GameHistory = ({ history, onClearHistory }: GameHistoryProps) => {
                   })}
                 </span>
               </div>
-              <div className="flex items-center gap-1 text-emerald-600 font-black text-xs">
+              <div className="flex items-center gap-1 text-primary font-black text-xs">
                 <TrendingUp size={14} /> {game.duration}m
               </div>
             </div>
@@ -50,7 +50,7 @@ export const GameHistory = ({ history, onClearHistory }: GameHistoryProps) => {
                   key={pi}
                   className="text-xs font-bold text-slate-600 flex items-center gap-1"
                 >
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>{" "}
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary/40"></div>{" "}
                   {p.name}
                 </span>
               ))}
