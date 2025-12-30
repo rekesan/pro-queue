@@ -109,7 +109,12 @@ const App = () => {
   const queuedCount = queue.filter((p) => p.status === "queued").length;
 
   // --- Actions ---
-  const addToQueue = (e: React.FormEvent, status: PlayerStatus = "queued", playerName: string = "", playerLevel: Level = "Intermediate") => {
+  const addToQueue = (
+    e: React.FormEvent,
+    status: PlayerStatus = "queued",
+    playerName: string = "",
+    playerLevel: Level = "Intermediate"
+  ) => {
     e.preventDefault();
     if (!playerName.trim()) return;
 
@@ -166,7 +171,6 @@ const App = () => {
         };
       });
     });
-
   };
 
   const startGroup = (playerIds: string[]) => {
@@ -242,9 +246,17 @@ const App = () => {
 
   const togglePlayerStatus = (playerId: string, newStatus: PlayerStatus) => {
     setQueue((prev) =>
-      prev.map((player) =>
-        player.id === playerId ? { ...player, status: newStatus } : player
-      )
+      prev.map((player) => {
+        if (player.id === playerId) {
+          const updatedPlayer: Player = {
+            ...player,
+            status: newStatus,
+            joinedAt: newStatus === "queued" ? Date.now() : player.joinedAt,
+          };
+          return updatedPlayer;
+        }
+        return player;
+      })
     );
   };
 
@@ -295,15 +307,11 @@ const App = () => {
                   </div>
                 </div>
               </div>
-              <AddPlayerModal
-                onSubmit={addToQueue}
-                onLoadMock={loadMockData}
-              />
+              <AddPlayerModal onSubmit={addToQueue} onLoadMock={loadMockData} />
             </div>
           </header>
 
           <main className="p-4 pb-0 space-y-8 max-w-4xl mx-auto">
-
             <CourtList
               courtCount={courtCount}
               gamesByCourt={gamesByCourt}

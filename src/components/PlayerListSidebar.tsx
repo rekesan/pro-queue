@@ -51,7 +51,7 @@ export const PlayerListSidebar = ({
       <SidebarContent className="p-4">
         <div className="space-y-3">
           {allPlayers
-            .sort((a, b) => a.joinedAt - b.joinedAt)
+            .sort((a, b) => a.name.localeCompare(b.name))
             .map((player) => (
               <div
                 key={player.id}
