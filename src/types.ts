@@ -1,10 +1,11 @@
 export type Level = "Beginner" | "Intermediate" | "Advanced";
+export type PlayerStatus = "queued" | "standby" | "playing";
 
 export interface Player {
   id: string;
   name: string;
   level: Level;
-  status: "waiting" | "playing";
+  status: PlayerStatus;
   joinedAt: number;
   startedAt: number | null;
   courtNumber: number | null;

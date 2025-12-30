@@ -1,12 +1,13 @@
-import type { Level } from "../types";
-import { Plus, Database } from "lucide-react";
+import { useState } from "react";
+import type { Level, PlayerStatus } from "../types";
+import { Plus, Database, Pause } from "lucide-react";
 
 interface AddPlayerFormProps {
   name: string;
   setName: (name: string) => void;
   level: Level;
   setLevel: (level: Level) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (e: React.FormEvent, status: PlayerStatus) => void;
   onLoadMock: () => void;
 }
 
@@ -18,6 +19,14 @@ export const AddPlayerForm = ({
   onSubmit,
   onLoadMock,
 }: AddPlayerFormProps) => {
+  const [isStandby, setIsStandby] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    const status: PlayerStatus = isStandby ? 'standby' : 'queued';
+    onSubmit(e, status);
+    setIsStandby(false);
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6 border-2 border-primary animate-in fade-in zoom-in duration-200">
       <div className="flex justify-between items-center mb-4">
@@ -31,7 +40,7 @@ export const AddPlayerForm = ({
           <Database size={10} /> Demo Mode
         </button>
       </div>
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           autoFocus
           className="w-full bg-slate-100 border-none rounded-xl p-3 focus:ring-2 focus:ring-primary outline-none text-lg"
@@ -55,8 +64,24 @@ export const AddPlayerForm = ({
             </button>
           ))}
         </div>
+
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={isStandby}
+              onChange={(e) => setIsStandby(e.target.checked)}
+              className="w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary"
+            />
+            <span className="text-sm text-slate-600 flex items-center gap-1">
+              <Pause size={14} className="text-amber-500" />
+              Start on standby (not in queue)
+            </span>
+          </label>
+        </div>
+
         <button className="w-full bg-primary text-white py-4 rounded-xl font-black text-lg shadow-lg hover:brightness-110 transition-all">
-          JOIN THE HOPPER
+          {isStandby ? 'ADD TO STANDBY' : 'JOIN THE QUEUE'}
         </button>
       </form>
     </div>

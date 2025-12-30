@@ -1,14 +1,21 @@
 import { useState, useEffect, useRef } from "react";
-import {
-  Trash2,
-  UserPlus,
-  Settings,
-} from "lucide-react";
-import type { Player, GameHistory as GameHistoryType, Level } from "./types";
+import { Trash2, UserPlus, Settings } from "lucide-react";
+import type {
+  Player,
+  GameHistory as GameHistoryType,
+  Level,
+  PlayerStatus,
+} from "./types";
 import { AddPlayerForm } from "./components/AddPlayerForm";
 import { CourtList } from "./components/CourtList";
 import { Waitlist } from "./components/Waitlist";
+import { PlayerListSidebar } from "./components/PlayerListSidebar";
 import { GameHistory } from "./components/GameHistory";
+import {
+  Sidebar,
+  SidebarProvider,
+  SidebarTrigger,
+} from "./components/ui/sidebar";
 
 // Configuration constants
 const AVG_GAME_MINS = 15;
@@ -59,7 +66,7 @@ const App = () => {
 
   // --- Derived State (React Compiler handles memoization) ---
   const playingPlayers = queue.filter((item) => item.status === "playing");
-  
+
   const gamesByCourt = playingPlayers.reduce((acc, player) => {
     if (player.courtNumber) {
       if (!acc[player.courtNumber]) acc[player.courtNumber] = [];
@@ -72,7 +79,7 @@ const App = () => {
 
   const groupedWaitlist = (() => {
     const pool = [...queue]
-      .filter((item) => item.status === "waiting")
+      .filter((item) => item.status === "queued")
       .sort((a, b) => a.joinedAt - b.joinedAt);
 
     const groups: Player[][] = [];
@@ -91,8 +98,8 @@ const App = () => {
       for (let i = 0; i < 3; i++) {
         const others = pool.filter((p) => !processedIds.has(p.id));
         if (others.length === 0) break;
-        const candidate = 
-          others.find((p) => !firstPlayer.lastPartnerIds.includes(p.id)) || 
+        const candidate =
+          others.find((p) => !firstPlayer.lastPartnerIds.includes(p.id)) ||
           others[0];
         currentGroup.push(candidate);
         processedIds.add(candidate.id);
@@ -102,10 +109,10 @@ const App = () => {
     return groups;
   })();
 
-  const waitingCount = queue.filter(p => p.status === 'waiting').length;
+  const queuedCount = queue.filter((p) => p.status === "queued").length;
 
   // --- Actions ---
-  const addToQueue = (e: React.FormEvent) => {
+  const addToQueue = (e: React.FormEvent, status: PlayerStatus = "queued") => {
     e.preventDefault();
     if (!name.trim()) return;
 
@@ -115,7 +122,7 @@ const App = () => {
         id: crypto.randomUUID(),
         name: name.trim(),
         level,
-        status: "waiting",
+        status,
         joinedAt: ts,
         startedAt: null,
         courtNumber: null,
@@ -123,21 +130,32 @@ const App = () => {
       };
       return [...prev, newEntry];
     });
-    
+
     setName("");
     setShowAddForm(false);
   };
 
   const loadMockData = () => {
     const mockNames = [
-      "Ben Johns", "Anna Leigh", "Tyson McGuffin", "Catherine Parenteau",
-      "JW Johnson", "Lea Jansen", "Riley Newman", "Parris Todd",
-      "Zane Navratil", "Lucy Kovalova", "Matt Wright", "Callie Smith",
-      "Dekel Bar", "Vivienne David", "Jay Devilliers",
+      "Ben Johns",
+      "Anna Leigh",
+      "Tyson McGuffin",
+      "Catherine Parenteau",
+      "JW Johnson",
+      "Lea Jansen",
+      "Riley Newman",
+      "Parris Todd",
+      "Zane Navratil",
+      "Lucy Kovalova",
+      "Matt Wright",
+      "Callie Smith",
+      "Dekel Bar",
+      "Vivienne David",
+      "Jay Devilliers",
     ];
 
     const levels: Level[] = ["Advanced", "Intermediate", "Beginner"];
-    
+
     setQueue(() => {
       const ts = Date.now();
       return mockNames.map((name, index) => {
@@ -146,7 +164,7 @@ const App = () => {
           id: crypto.randomUUID(),
           name,
           level: levels[index % 3],
-          status: isPlaying ? "playing" : "waiting",
+          status: isPlaying ? "playing" : "queued",
           joinedAt: ts - index * 60000,
           startedAt: isPlaying ? ts - 900000 : null,
           courtNumber: isPlaying ? 1 : null,
@@ -154,7 +172,7 @@ const App = () => {
         };
       });
     });
-    
+
     setShowAddForm(false);
   };
 
@@ -196,7 +214,7 @@ const App = () => {
         const ts = Date.now();
         const gameStart = playersInGame[0]?.startedAt || ts;
         const durationMins = Math.round((ts - gameStart) / 60000);
-        
+
         const historyEntry: GameHistoryType = {
           id: crypto.randomUUID(),
           timestamp: ts,
@@ -215,7 +233,7 @@ const App = () => {
         .filter((p) => playerIds.includes(p.id))
         .map((p) => ({
           ...p,
-          status: "waiting" as const,
+          status: "queued" as const,
           startedAt: null,
           courtNumber: null,
           joinedAt: ts,
@@ -229,6 +247,14 @@ const App = () => {
     setQueue((prev) => prev.filter((item) => item.id !== id));
   };
 
+  const togglePlayerStatus = (playerId: string, newStatus: PlayerStatus) => {
+    setQueue((prev) =>
+      prev.map((player) =>
+        player.id === playerId ? { ...player, status: newStatus } : player
+      )
+    );
+  };
+
   const clearHistory = () => {
     if (window.confirm("Clear all game history?")) {
       setHistory([]);
@@ -239,115 +265,127 @@ const App = () => {
     Math.ceil((groupIndex + 1) / courtCount) * AVG_GAME_MINS;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-24 font-sans">
-      <header className="bg-primary text-white p-6 shadow-lg sticky top-0 z-50">
-        <div className="max-w-2xl mx-auto flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-black italic tracking-wider flex items-center gap-2">
-              PRO<span className="text-blue-200">QUEUE</span>
-            </h1>
-            <div className="flex items-center gap-2 mt-1 opacity-90">
-              <label className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                <Settings size={10} /> {courtCount} Courts Configured
-              </label>
-              <select
-                value={courtCount}
-                onChange={(e) => setCourtCount(Number(e.target.value))}
-                className="bg-sky-800 text-[10px] border-none rounded px-1 py-0.5 outline-none font-bold cursor-pointer appearance-none text-sky-100"
-              >
-                {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
-                  <option key={n} value={n}>
-                    {n} Courts
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="bg-white text-primary p-2 rounded-full shadow-md hover:scale-105 transition-transform"
-          >
-            {showAddForm ? (
-              <Trash2 size={24} className="rotate-45" />
-            ) : (
-              <UserPlus size={24} />
-            )}
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto p-4 space-y-8">
-        {showAddForm && (
-          <AddPlayerForm
-            name={name}
-            setName={setName}
-            level={level}
-            setLevel={setLevel}
-            onSubmit={addToQueue}
-            onLoadMock={loadMockData}
+    <SidebarProvider>
+      <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-1">
+        <Sidebar className="border-r border-slate-200">
+          <PlayerListSidebar
+            allPlayers={queue}
+            onToggleStatus={togglePlayerStatus}
+            onRemovePlayer={removeItem}
           />
-        )}
+        </Sidebar>
 
-        <CourtList
-          courtCount={courtCount}
-          gamesByCourt={gamesByCourt}
-          now={now}
-          onFinishGroup={finishGroupAndRequeue}
-        />
-
-        <Waitlist
-          groupedWaitlist={groupedWaitlist}
-          occupiedCount={occupiedCount}
-          courtCount={courtCount}
-          onStartGroup={startGroup}
-          onRemoveItem={removeItem}
-          playersPerGame={PLAYERS_PER_GAME}
-          waitingCount={waitingCount}
-        />
-
-        <GameHistory
-          history={history}
-          onClearHistory={clearHistory}
-        />
-      </main>
-
-      <footer className="fixed bottom-0 left-0 right-0 bg-slate-900 text-white p-4 shadow-2xl z-50">
-        <div className="max-w-2xl mx-auto flex justify-between items-center px-4">
-          <div className="flex gap-6">
-            <div className="text-left">
-              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
-                Est. Wait
-              </p>
-              <p className="text-sm font-black italic text-accent">
-                {groupedWaitlist.length > 0
-                  ? getWaitTimeForGroup(groupedWaitlist.length - 1)
-                  : 0}{" "}
-                MINS
-              </p>
+        <div className="flex-1">
+          <header className="bg-primary text-white p-6 shadow-lg sticky top-0 z-50">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-4">
+                <SidebarTrigger className="text-white hover:bg-primary/20" />
+                <div>
+                  <h1 className="text-2xl font-black italic tracking-wider flex items-center gap-2">
+                    PRO<span className="text-blue-200">QUEUE</span>
+                  </h1>
+                  <div className="flex items-center gap-2 mt-1 opacity-90">
+                    <label className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                      <Settings size={10} /> {courtCount} Courts Configured
+                    </label>
+                    <select
+                      value={courtCount}
+                      onChange={(e) => setCourtCount(Number(e.target.value))}
+                      className="bg-sky-800 text-[10px] border-none rounded px-1 py-0.5 outline-none font-bold cursor-pointer appearance-none text-sky-100"
+                    >
+                      {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
+                        <option key={n} value={n}>
+                          {n} Courts
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowAddForm(!showAddForm)}
+                className="bg-white text-primary p-2 rounded-full shadow-md hover:scale-105 transition-transform"
+              >
+                {showAddForm ? (
+                  <Trash2 size={24} className="rotate-45" />
+                ) : (
+                  <UserPlus size={24} />
+                )}
+              </button>
             </div>
-            <div className="w-px h-8 bg-slate-800 self-center"></div>
-            <div className="text-left">
-              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
-                Games Completed
-              </p>
-              <p className="text-sm font-black text-sky-400">
-                {history.length} SESSIONS
-              </p>
+          </header>
+
+          <main className="p-4 pb-0 space-y-8 max-w-4xl mx-auto">
+            {showAddForm && (
+              <AddPlayerForm
+                name={name}
+                setName={setName}
+                level={level}
+                setLevel={setLevel}
+                onSubmit={addToQueue}
+                onLoadMock={loadMockData}
+              />
+            )}
+
+            <CourtList
+              courtCount={courtCount}
+              gamesByCourt={gamesByCourt}
+              now={now}
+              onFinishGroup={finishGroupAndRequeue}
+            />
+
+            <Waitlist
+              groupedWaitlist={groupedWaitlist}
+              occupiedCount={occupiedCount}
+              courtCount={courtCount}
+              onStartGroup={startGroup}
+              onRemoveItem={removeItem}
+              playersPerGame={PLAYERS_PER_GAME}
+              queuedCount={queuedCount}
+            />
+
+            <GameHistory history={history} onClearHistory={clearHistory} />
+          </main>
+
+          <footer className="sticky bottom-0 bg-slate-900 text-white p-4 shadow-2xl z-50">
+            <div className="max-w-4xl mx-auto flex justify-between items-center px-4">
+              <div className="flex gap-6">
+                <div className="text-left">
+                  <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
+                    Est. Wait
+                  </p>
+                  <p className="text-sm font-black italic text-accent">
+                    {groupedWaitlist.length > 0
+                      ? getWaitTimeForGroup(groupedWaitlist.length - 1)
+                      : 0}{" "}
+                    MINS
+                  </p>
+                </div>
+                <div className="w-px h-8 bg-slate-800 self-center"></div>
+                <div className="text-left">
+                  <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
+                    Games Completed
+                  </p>
+                  <p className="text-sm font-black text-sky-400">
+                    {history.length} SESSIONS
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
+                  Court Load
+                </p>
+                <p className="text-sm font-black">
+                  <span className="text-accent">{occupiedCount}</span>
+                  <span className="text-slate-600 mx-1">/</span>
+                  {courtCount}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="text-right">
-            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
-              Court Load
-            </p>
-            <p className="text-sm font-black">
-              <span className="text-accent">{occupiedCount}</span>
-              <span className="text-slate-600 mx-1">/</span>
-              {courtCount}
-            </p>
-          </div>
+          </footer>
         </div>
-      </footer>
-    </div>
+      </div>
+    </SidebarProvider>
   );
 };
 

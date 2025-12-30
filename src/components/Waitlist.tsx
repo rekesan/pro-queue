@@ -8,7 +8,7 @@ interface WaitlistProps {
   onStartGroup: (playerIds: string[]) => void;
   onRemoveItem: (id: string) => void;
   playersPerGame: number;
-  waitingCount: number;
+  queuedCount: number;
 }
 
 export const Waitlist = ({
@@ -18,16 +18,16 @@ export const Waitlist = ({
   onStartGroup,
   onRemoveItem,
   playersPerGame,
-  waitingCount,
+  queuedCount,
 }: WaitlistProps) => {
   return (
     <section>
       <div className="flex justify-between items-center mb-4 px-2">
         <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">
-          Waitlist
+          Active Queue
         </h2>
         <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400">
-          <Users size={12} /> {waitingCount} Waiting
+          <Users size={12} /> {queuedCount} Queued
         </div>
       </div>
       <div className="space-y-6">
@@ -36,7 +36,7 @@ export const Waitlist = ({
             key={gIdx}
             className={`relative p-4 rounded-2xl border-2 transition-all ${
               group.length === playersPerGame
-                ? "bg-white shadow-md border-primary-light"
+                ? "bg-white border-primary/20 shadow-md"
                 : "bg-slate-50 border-dashed border-slate-200"
             }`}
           >
@@ -100,12 +100,13 @@ export const Waitlist = ({
             </div>
           </div>
         ))}
-        {waitingCount === 0 && (
+        {queuedCount === 0 && (
           <div className="text-center py-12 bg-slate-100 border-2 border-dashed border-slate-200 rounded-3xl opacity-50">
             <Users size={32} className="mx-auto mb-2 text-slate-300" />
             <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
-              Waitlist
+              No players in queue
             </p>
+            <p className="text-xs text-slate-500 mt-1">Players on standby won't appear here</p>
           </div>
         )}
       </div>
