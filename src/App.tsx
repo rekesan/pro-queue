@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { Trash2, UserPlus, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import type {
   Player,
   GameHistory as GameHistoryType,
   Level,
   PlayerStatus,
 } from "./types";
-import { AddPlayerForm } from "./components/AddPlayerForm";
+import { AddPlayerModal } from "./components/AddPlayerModal";
 import { CourtList } from "./components/CourtList";
 import { Waitlist } from "./components/Waitlist";
 import { PlayerListSidebar } from "./components/PlayerListSidebar";
@@ -34,9 +34,6 @@ const App = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [name, setName] = useState("");
-  const [level, setLevel] = useState<Level>("Intermediate");
-  const [showAddForm, setShowAddForm] = useState(false);
   const [courtCount, setCourtCount] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEY + "_courts");
     return saved ? Number(saved) : 2;
@@ -112,16 +109,16 @@ const App = () => {
   const queuedCount = queue.filter((p) => p.status === "queued").length;
 
   // --- Actions ---
-  const addToQueue = (e: React.FormEvent, status: PlayerStatus = "queued") => {
+  const addToQueue = (e: React.FormEvent, status: PlayerStatus = "queued", playerName: string = "", playerLevel: Level = "Intermediate") => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!playerName.trim()) return;
 
     setQueue((prev) => {
       const ts = Date.now();
       const newEntry: Player = {
         id: crypto.randomUUID(),
-        name: name.trim(),
-        level,
+        name: playerName.trim(),
+        level: playerLevel,
         status,
         joinedAt: ts,
         startedAt: null,
@@ -130,9 +127,6 @@ const App = () => {
       };
       return [...prev, newEntry];
     });
-
-    setName("");
-    setShowAddForm(false);
   };
 
   const loadMockData = () => {
@@ -173,7 +167,6 @@ const App = () => {
       });
     });
 
-    setShowAddForm(false);
   };
 
   const startGroup = (playerIds: string[]) => {
@@ -302,30 +295,14 @@ const App = () => {
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => setShowAddForm(!showAddForm)}
-                className="bg-white text-primary p-2 rounded-full shadow-md hover:scale-105 transition-transform"
-              >
-                {showAddForm ? (
-                  <Trash2 size={24} className="rotate-45" />
-                ) : (
-                  <UserPlus size={24} />
-                )}
-              </button>
+              <AddPlayerModal
+                onSubmit={addToQueue}
+                onLoadMock={loadMockData}
+              />
             </div>
           </header>
 
           <main className="p-4 pb-0 space-y-8 max-w-4xl mx-auto">
-            {showAddForm && (
-              <AddPlayerForm
-                name={name}
-                setName={setName}
-                level={level}
-                setLevel={setLevel}
-                onSubmit={addToQueue}
-                onLoadMock={loadMockData}
-              />
-            )}
 
             <CourtList
               courtCount={courtCount}
