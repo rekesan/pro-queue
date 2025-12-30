@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Settings } from "lucide-react";
+import { Settings, RotateCcw } from "lucide-react";
 import type {
   Player,
   GameHistory as GameHistoryType,
@@ -266,6 +266,15 @@ const App = () => {
     }
   };
 
+  const resetApplication = () => {
+    if (window.confirm("Reset all data and start fresh? This will clear all players, history, and settings.")) {
+      localStorage.removeItem(STORAGE_KEY + "_queue");
+      localStorage.removeItem(STORAGE_KEY + "_history");
+      localStorage.removeItem(STORAGE_KEY + "_courts");
+      window.location.reload(); // Reload to reset state
+    }
+  };
+
   const getWaitTimeForGroup = (groupIndex: number) =>
     Math.ceil((groupIndex + 1) / courtCount) * AVG_GAME_MINS;
 
@@ -304,6 +313,14 @@ const App = () => {
                         </option>
                       ))}
                     </select>
+                    <button
+                      onClick={resetApplication}
+                      className="bg-red-600 hover:bg-red-700 text-[10px] border-none rounded px-2 py-0.5 outline-none font-bold cursor-pointer text-white ml-2 flex items-center gap-1 transition-colors"
+                      title="Reset all data"
+                    >
+                      <RotateCcw size={10} />
+                      Reset
+                    </button>
                   </div>
                 </div>
               </div>
