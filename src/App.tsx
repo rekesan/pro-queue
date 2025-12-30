@@ -291,7 +291,7 @@ const App = () => {
         </Sidebar>
 
         <div className="flex-1">
-          <header className="bg-primary text-white p-6 shadow-lg sticky top-0 z-50">
+          <header className="bg-primary text-white p-6 py-3.5 shadow-lg sticky top-0 z-50">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-4">
                 <SidebarTrigger className="text-white hover:bg-primary/20" />
@@ -329,7 +329,7 @@ const App = () => {
             </div>
           </header>
 
-          <main className="p-4 space-y-8 max-w-4xl min-h-[82.65%] mx-auto">
+          <main className="p-4 space-y-8 max-w-4xl min-h-[84.76%] mx-auto">
             <CourtList
               courtCount={courtCount}
               gamesByCourt={gamesByCourt}
