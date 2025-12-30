@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Settings, RotateCcw } from "lucide-react";
+import { Settings, RotateCcw, Eye } from "lucide-react";
 import type {
   Player,
   GameHistory as GameHistoryType,
@@ -10,7 +10,7 @@ import { AddPlayerModal } from "./components/AddPlayerModal";
 import { CourtList } from "./components/CourtList";
 import { Waitlist } from "./components/Waitlist";
 import { PlayerListSidebar } from "./components/PlayerListSidebar";
-import { GameHistory } from "./components/GameHistory";
+import { GameHistoryModal } from "./components/GameHistoryModal";
 import {
   Sidebar,
   SidebarProvider,
@@ -40,6 +40,7 @@ const App = () => {
   });
 
   const [now, setNow] = useState<number>(() => Date.now());
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
   const isInitialMount = useRef(true);
 
   // Update current time via interval
@@ -328,7 +329,7 @@ const App = () => {
             </div>
           </header>
 
-          <main className="p-4 pb-0 space-y-8 max-w-4xl mx-auto">
+          <main className="p-4 space-y-8 max-w-4xl min-h-[82.65%] mx-auto">
             <CourtList
               courtCount={courtCount}
               gamesByCourt={gamesByCourt}
@@ -345,8 +346,6 @@ const App = () => {
               playersPerGame={PLAYERS_PER_GAME}
               queuedCount={queuedCount}
             />
-
-            <GameHistory history={history} onClearHistory={clearHistory} />
           </main>
 
           <footer className="sticky bottom-0 bg-slate-900 text-white p-4 shadow-2xl z-50">
@@ -364,13 +363,20 @@ const App = () => {
                   </p>
                 </div>
                 <div className="w-px h-8 bg-slate-800 self-center"></div>
-                <div className="text-left">
+                <div
+                  className="relative text-left cursor-pointer rounded transition-colors before:-inset-1 before:-z-10 before:absolute hover:before:bg-slate-800"
+                  onClick={() => setHistoryModalOpen(true)}
+                  title="Click to view game history"
+                >
                   <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">
                     Games Completed
                   </p>
-                  <p className="text-sm font-black text-sky-400">
-                    {history.length} SESSIONS
-                  </p>
+                  <div className="flex items-center gap-1">
+                    <p className="text-sm font-black text-sky-400">
+                      {history.length} SESSIONS
+                    </p>
+                    <Eye size={14} className="text-sky-400 opacity-80" />
+                  </div>
                 </div>
               </div>
               <div className="text-right">
@@ -386,6 +392,13 @@ const App = () => {
             </div>
           </footer>
         </div>
+
+        <GameHistoryModal
+          history={history}
+          onClearHistory={clearHistory}
+          open={historyModalOpen}
+          onOpenChange={setHistoryModalOpen}
+        />
       </div>
     </SidebarProvider>
   );
