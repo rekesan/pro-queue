@@ -280,7 +280,7 @@ const App = () => {
     Math.ceil((groupIndex + 1) / courtCount) * AVG_GAME_MINS;
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-1">
         <Sidebar className="border-r border-slate-200">
           <PlayerListSidebar
@@ -290,7 +290,7 @@ const App = () => {
           />
         </Sidebar>
 
-        <div className="flex-1">
+        <div className="flex-1 @container">
           <header className="bg-primary text-white p-6 py-3.5 shadow-lg sticky top-0 z-50">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-4">
@@ -329,12 +329,13 @@ const App = () => {
             </div>
           </header>
 
-          <main className="p-4 space-y-8 max-w-4xl min-h-[84.76%] mx-auto">
+          <main className="p-4 space-y-8 max-w-4xl min-h-[84.76%] mx-auto @3xl:grid @3xl:grid-cols-2 @3xl:max-w-none @3xl:gap-4">
             <CourtList
               courtCount={courtCount}
               gamesByCourt={gamesByCourt}
               now={now}
               onFinishGroup={finishGroupAndRequeue}
+              className="@3xl:sticky @3xl:top-24.75 @3xl:h-fit"
             />
 
             <Waitlist

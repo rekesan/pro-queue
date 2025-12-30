@@ -6,6 +6,7 @@ interface CourtListProps {
   gamesByCourt: Record<number, Player[]>;
   now: number;
   onFinishGroup: (playerIds: string[]) => void;
+  className?: string;
 }
 
 export const CourtList = ({
@@ -13,13 +14,14 @@ export const CourtList = ({
   gamesByCourt,
   now,
   onFinishGroup,
+  className,
 }: CourtListProps) => {
   return (
-    <section>
+    <section className={className}>
       <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4 px-2">
         Courts
       </h2>
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-4 @container">
         {Array.from({ length: courtCount }).map((_, idx) => {
           const courtNumber = idx + 1;
           const gamePlayers = gamesByCourt[courtNumber];
@@ -32,10 +34,10 @@ export const CourtList = ({
                 isOccupied
                   ? "bg-white border-primary/20"
                   : "bg-slate-50 border-dashed border-slate-200 opacity-60"
-              } flex flex-col md:flex-row md:items-center gap-4`}
+              } flex flex-col @xl:flex-row @xl:items-center gap-4`}
             >
               <div
-                className={`flex-shrink-0 w-full md:w-20 h-12 rounded-xl flex flex-col items-center justify-center shadow-inner ${
+                className={`flex-shrink-0 w-full @xl:w-20 h-12 rounded-xl flex flex-col items-center justify-center shadow-inner ${
                   isOccupied
                     ? "bg-primary text-white"
                     : "bg-slate-300 text-slate-500"
@@ -51,7 +53,7 @@ export const CourtList = ({
 
               {isOccupied ? (
                 <>
-                  <div className="grow grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="grow grid grid-cols-2 @lg:grid-cols-4 gap-2">
                     {gamePlayers.map((p) => (
                       <div
                         key={p.id}
