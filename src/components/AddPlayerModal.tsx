@@ -11,7 +11,12 @@ import {
 } from "./ui/dialog";
 
 interface AddPlayerModalProps {
-  onSubmit: (e: React.FormEvent, status: PlayerStatus) => void;
+  onSubmit: (
+    e: React.FormEvent,
+    status: PlayerStatus,
+    playerName: string,
+    playerLevel: Level
+  ) => void;
   onLoadMock: () => void;
 }
 
@@ -22,8 +27,8 @@ export const AddPlayerModal = ({ onSubmit, onLoadMock }: AddPlayerModalProps) =>
   const [isStandby, setIsStandby] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
-    const status: PlayerStatus = isStandby ? 'standby' : 'queued';
-    onSubmit(e, status);
+    const status: PlayerStatus = isStandby ? "standby" : "queued";
+    onSubmit(e, status, name, level);
     setName("");
     setLevel("Intermediate");
     setIsStandby(false);
@@ -85,20 +90,22 @@ export const AddPlayerModal = ({ onSubmit, onLoadMock }: AddPlayerModalProps) =>
                 Skill Level
               </label>
               <div className="grid grid-cols-3 gap-2">
-                {(["Beginner", "Intermediate", "Advanced"] as Level[]).map((l) => (
-                  <button
-                    key={l}
-                    type="button"
-                    onClick={() => setLevel(l)}
-                    className={`py-3 px-2 rounded-lg text-sm font-bold border-2 transition-all ${
-                      level === l
-                        ? "bg-primary-light border-primary text-primary-dark"
-                        : "border-slate-200 text-slate-400 hover:border-slate-300"
-                    }`}
-                  >
-                    {l}
-                  </button>
-                ))}
+                {(["Beginner", "Intermediate", "Advanced"] as Level[]).map(
+                  (l) => (
+                    <button
+                      key={l}
+                      type="button"
+                      onClick={() => setLevel(l)}
+                      className={`py-3 px-2 rounded-lg text-sm font-bold border-2 transition-all ${
+                        level === l
+                          ? "bg-primary-light border-primary text-primary-dark"
+                          : "border-slate-200 text-slate-400 hover:border-slate-300"
+                      }`}
+                    >
+                      {l}
+                    </button>
+                  )
+                )}
               </div>
             </div>
 
@@ -121,7 +128,7 @@ export const AddPlayerModal = ({ onSubmit, onLoadMock }: AddPlayerModalProps) =>
               type="submit"
               className="w-full bg-primary text-white py-4 rounded-xl font-black text-lg shadow-lg hover:brightness-110 transition-all"
             >
-              {isStandby ? 'ADD TO STANDBY' : 'JOIN THE QUEUE'}
+              {isStandby ? "ADD TO STANDBY" : "JOIN THE QUEUE"}
             </button>
           </form>
         </div>
