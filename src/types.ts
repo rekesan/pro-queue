@@ -12,6 +12,11 @@ export interface Player {
   lastPartnerIds: string[];
 }
 
+export interface Court {
+  id: number;
+  name?: string;
+}
+
 export interface GameHistory {
   id: string;
   timestamp: number;

@@ -1,54 +1,67 @@
-import type { Player } from "../types";
-import { Clock, RotateCcw, CircleSlash } from "lucide-react";
+import type { Player, Court } from "../types";
+import { Clock, RotateCcw, CircleSlash, Plus, Trash2 } from "lucide-react";
+import { Button } from "./ui/button";
 
 interface CourtListProps {
-  courtCount: number;
+  courts: Court[];
   gamesByCourt: Record<number, Player[]>;
   now: number;
   onFinishGroup: (playerIds: string[]) => void;
+  onAddCourt: () => void;
+  onRemoveCourt: (courtId: number) => void;
   className?: string;
 }
 
 export const CourtList = ({
-  courtCount,
+  courts,
   gamesByCourt,
   now,
   onFinishGroup,
+  onAddCourt,
+  onRemoveCourt,
   className,
 }: CourtListProps) => {
   return (
     <section className={className}>
-      <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4 px-2">
-        Courts
-      </h2>
+      <div className="flex flex-row items-center justify-between mb-4">
+        <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest px-2">
+          Courts
+        </h2>
+        <Button onClick={onAddCourt} variant="secondary" size="sm" className="text-xs h-fit bg-transparent hover:bg-transparent hover:text-primary">
+          <Plus />
+          Add court
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 gap-4 @container">
-        {Array.from({ length: courtCount }).map((_, idx) => {
-          const courtNumber = idx + 1;
+        {courts.map((court) => {
+          const courtNumber = court.id;
           const gamePlayers = gamesByCourt[courtNumber];
           const isOccupied = !!gamePlayers;
 
           return (
             <div
-              key={courtNumber}
+              key={court.id}
               className={`p-4 rounded-2xl shadow-sm border transition-all ${
                 isOccupied
                   ? "bg-white border-primary/20"
-                  : "bg-slate-50 border-dashed border-slate-200 opacity-60"
-              } flex flex-col @xl:flex-row @xl:items-center gap-4`}
+                  : "bg-slate-50 border-dashed border-slate-200 opacity-80"
+              } flex flex-col gap-4 relative`}
             >
-              <div
-                className={`flex-shrink-0 w-full @xl:w-20 h-12 rounded-xl flex flex-col items-center justify-center shadow-inner ${
-                  isOccupied
-                    ? "bg-primary text-white"
-                    : "bg-slate-300 text-slate-500"
-                }`}
-              >
-                <span className="text-[10px] font-black uppercase opacity-80">
-                  Court
+              <div className="relative flex flex-row justify-between">
+                <span className="text-sm font-black opacity-80">
+                  {court.name || `Court ${court.id}`}
                 </span>
-                <span className="text-xl font-black leading-none">
-                  {courtNumber}
-                </span>
+
+                {courts.length > 1 && !isOccupied && (
+                  <button
+                    onClick={() => onRemoveCourt(court.id)}
+                    className="w-6 h-6 hover:bg-red-500 text-red-500 hover:text-white rounded-full flex items-center justify-center"
+                    title={`Remove ${court.name || `Court ${court.id}`}`}
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                )}
               </div>
 
               {isOccupied ? (
@@ -66,7 +79,7 @@ export const CourtList = ({
                       </div>
                     ))}
                   </div>
-                  <div className="flex flex-col items-end gap-1">
+                  <div className="flex flex-row items-center justify-end gap-2">
                     <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1">
                       <Clock size={10} />{" "}
                       {Math.round(

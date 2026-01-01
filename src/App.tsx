@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Settings, RotateCcw, Eye } from "lucide-react";
 import type {
   Player,
+  Court,
   GameHistory as GameHistoryType,
   Level,
   PlayerStatus,
@@ -34,9 +35,19 @@ const App = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [courtCount, setCourtCount] = useState(() => {
+  const [courts, setCourts] = useState<Court[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY + "_courts");
-    return saved ? Number(saved) : 2;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Check if it's an array (new format) or number (old format)
+      if (Array.isArray(parsed)) {
+        return parsed;
+      } else if (typeof parsed === 'number') {
+        // Fallback to number for backward compatibility
+        return Array.from({ length: parsed }, (_, i) => ({ id: i + 1 }));
+      }
+    }
+    return [{ id: 1 }, { id: 2 }];
   });
 
   const [now, setNow] = useState<number>(() => Date.now());
@@ -59,8 +70,8 @@ const App = () => {
     }
     localStorage.setItem(STORAGE_KEY + "_queue", JSON.stringify(queue));
     localStorage.setItem(STORAGE_KEY + "_history", JSON.stringify(history));
-    localStorage.setItem(STORAGE_KEY + "_courts", courtCount.toString());
-  }, [queue, history, courtCount]);
+    localStorage.setItem(STORAGE_KEY + "_courts", JSON.stringify(courts));
+  }, [queue, history, courts]);
 
   // --- Derived State (React Compiler handles memoization) ---
   const playingPlayers = queue.filter((item) => item.status === "playing");
@@ -176,9 +187,9 @@ const App = () => {
 
   const startGroup = (playerIds: string[]) => {
     let assignedCourt: number | null = null;
-    for (let i = 1; i <= courtCount; i++) {
-      if (!gamesByCourt[i]) {
-        assignedCourt = i;
+    for (const court of courts) {
+      if (!gamesByCourt[court.id]) {
+        assignedCourt = court.id;
         break;
       }
     }
@@ -268,7 +279,11 @@ const App = () => {
   };
 
   const resetApplication = () => {
-    if (window.confirm("Reset all data and start fresh? This will clear all players, history, and settings.")) {
+    if (
+      window.confirm(
+        "Reset all data and start fresh? This will clear all players, history, and settings."
+      )
+    ) {
       localStorage.removeItem(STORAGE_KEY + "_queue");
       localStorage.removeItem(STORAGE_KEY + "_history");
       localStorage.removeItem(STORAGE_KEY + "_courts");
@@ -276,8 +291,19 @@ const App = () => {
     }
   };
 
+  const addCourt = () => {
+    setCourts((prev) => [
+      ...prev,
+      { id: Math.max(...prev.map((c) => c.id), 0) + 1 },
+    ]);
+  };
+
+  const removeCourt = (courtId: number) => {
+    setCourts((prev) => prev.filter((court) => court.id !== courtId));
+  };
+
   const getWaitTimeForGroup = (groupIndex: number) =>
-    Math.ceil((groupIndex + 1) / courtCount) * AVG_GAME_MINS;
+    Math.ceil((groupIndex + 1) / courts.length) * AVG_GAME_MINS;
 
   return (
     <SidebarProvider defaultOpen={false}>
@@ -301,19 +327,8 @@ const App = () => {
                   </h1>
                   <div className="flex items-center gap-2 mt-1 opacity-90">
                     <label className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                      <Settings size={10} /> {courtCount} Courts Configured
+                      <Settings size={10} /> {courts.length} Courts Active
                     </label>
-                    <select
-                      value={courtCount}
-                      onChange={(e) => setCourtCount(Number(e.target.value))}
-                      className="bg-sky-800 text-[10px] border-none rounded px-1 py-0.5 outline-none font-bold cursor-pointer appearance-none text-sky-100"
-                    >
-                      {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
-                        <option key={n} value={n}>
-                          {n} Courts
-                        </option>
-                      ))}
-                    </select>
                     <button
                       onClick={resetApplication}
                       className="bg-red-600 hover:bg-red-700 text-[10px] border-none rounded px-2 py-0.5 outline-none font-bold cursor-pointer text-white ml-2 flex items-center gap-1 transition-colors"
@@ -331,17 +346,19 @@ const App = () => {
 
           <main className="p-4 space-y-8 max-w-4xl min-h-[84.76%] mx-auto @3xl:grid @3xl:grid-cols-2 @3xl:max-w-none @3xl:gap-4">
             <CourtList
-              courtCount={courtCount}
+              courts={courts}
               gamesByCourt={gamesByCourt}
               now={now}
               onFinishGroup={finishGroupAndRequeue}
+              onAddCourt={addCourt}
+              onRemoveCourt={removeCourt}
               className="@3xl:sticky @3xl:top-24.75 @3xl:h-fit"
             />
 
             <Waitlist
               groupedWaitlist={groupedWaitlist}
               occupiedCount={occupiedCount}
-              courtCount={courtCount}
+              courtCount={courts.length}
               onStartGroup={startGroup}
               onRemoveItem={removeItem}
               playersPerGame={PLAYERS_PER_GAME}
@@ -387,7 +404,7 @@ const App = () => {
                 <p className="text-sm font-black">
                   <span className="text-accent">{occupiedCount}</span>
                   <span className="text-slate-600 mx-1">/</span>
-                  {courtCount}
+                  {courts.length}
                 </p>
               </div>
             </div>
