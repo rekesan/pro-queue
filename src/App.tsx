@@ -344,7 +344,7 @@ const App = () => {
             </div>
           </header>
 
-          <main className="p-4 space-y-8 max-w-4xl min-h-[84.76%] mx-auto @3xl:grid @3xl:grid-cols-2 @3xl:max-w-none @3xl:gap-4">
+          <main className="p-4 space-y-8 max-w-4xl min-h-[84.76%] mx-auto @3xl:grid @3xl:grid-cols-2 @3xl:max-w-none @3xl:gap-4 @3xl:*:first:order-2 @3xl:*:not-first:order-1">
             <CourtList
               courts={courts}
               gamesByCourt={gamesByCourt}
