@@ -322,7 +322,7 @@ const App = () => {
               <div className="flex items-center gap-4">
                 <SidebarTrigger className="text-white hover:bg-primary/20" />
                 <div>
-                  <h1 className="text-2xl font-black italic tracking-wider flex items-center gap-2">
+                  <h1 className="text-2xl font-black italic tracking-wider flex items-center">
                     PRO<span className="text-blue-200">QUEUE</span>
                   </h1>
                   <div className="flex items-center gap-2 mt-1 opacity-90">
