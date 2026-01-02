@@ -302,6 +302,24 @@ const App = () => {
     setCourts((prev) => prev.filter((court) => court.id !== courtId));
   };
 
+  const handleBulkPlayerSubmit = (
+    players: Array<{ name: string; level: Level; status: PlayerStatus }>
+  ) => {
+    const ts = Date.now();
+    const newPlayers: Player[] = players.map((player) => ({
+      id: crypto.randomUUID(),
+      name: player.name,
+      level: player.level,
+      status: player.status,
+      joinedAt: ts,
+      startedAt: null,
+      courtNumber: null,
+      lastPartnerIds: [],
+    }));
+
+    setQueue((prev) => [...prev, ...newPlayers]);
+  };
+
   const getWaitTimeForGroup = (groupIndex: number) =>
     Math.ceil((groupIndex + 1) / courts.length) * AVG_GAME_MINS;
 
@@ -340,7 +358,11 @@ const App = () => {
                   </div>
                 </div>
               </div>
-              <AddPlayerModal onSubmit={addToQueue} onLoadMock={loadMockData} />
+              <AddPlayerModal
+                onSubmit={addToQueue}
+                onBulkSubmit={handleBulkPlayerSubmit}
+                onLoadMock={loadMockData}
+              />
             </div>
           </header>
 
